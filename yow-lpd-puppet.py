@@ -3,6 +3,7 @@ import os, sys
 import logging
 import shutil
 import common
+import subprocess
 git = common.git
 
 #return an array of channels to subscribe to
@@ -21,7 +22,9 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
         logging.info('Updated repo, restarting' )
 
         #restart the service to pick up any changes
-        os.execl(sys.executable, *([sys.executable]+sys.argv))
+        args = ['python','/var/lib/puppet/repos/git-stomp-hooks/git-stomp-listener.py','restart']
+        exit_code = subprocess.call(args)
+
     else:
         #use the default environment.
         branchname = os.path.basename(refname)
