@@ -17,6 +17,8 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
         #prune will delete branches that have been deleted from origin
         git(['remote','update','--prune'])
 
+        logging.info('Updated repo, restarting' )
+
         #restart the service to pick up any changes
         os.execl(sys.executable, sys.executable,'start')
     else:
@@ -27,6 +29,7 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
         if new_rev.startswith('0'):
             #deleting existing branch
             if os.path.exists(puppet_env) and os.path.isdir(puppet_env):
+                logging.info('Deleting environment $s.' % puppet_env)
                 shutil.rmtree(puppet_env)
 
         else:
@@ -34,6 +37,7 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
                 #environment already exists, just update
                 git(['fetch','--all'])
                 git(['reset','--hard','origin/' + branchname])
+                logging.info('Updated environment $s.' % puppet_env)
             else:
                 #new branch, so clone puppet repo to new branch
                 git(['clone',
@@ -41,3 +45,4 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
                      puppet_env_base,
                      '--branch',
                      branchname])
+                logging.info('Created environment $s.' % puppet_env)
