@@ -15,6 +15,7 @@ class StompListener(stomp.ConnectionListener):
     def on_error(self, headers, message):
         print('received an error %s' % message)
     def on_message(self, headers, message):
+        #extract info from message
         dest = headers['destination']
         gitdir, old_rev, new_rev, ref_name = message.strip().split(' ')
         HostHandler.on_message(dest, gitdir, old_rev, new_rev, ref_name)
