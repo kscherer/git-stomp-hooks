@@ -27,7 +27,7 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
 
     else:
         #use the default environment.
-        branchname = os.path.basename(refname)
+        branchname = os.path.basename(ref_name)
         puppet_env_base = '/etc/puppet/environments'
         puppet_env = puppet_env_base + '/' + branchname
 
