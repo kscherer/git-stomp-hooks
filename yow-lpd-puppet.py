@@ -14,8 +14,9 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
     if dest == "/topic/git/stomp-hook":
         os.chdir('/var/lib/puppet/repos/git-stomp-hooks')
 
-        #prune will delete branches that have been deleted from origin
-        git(['remote','update','--prune'])
+        #Since repo is non-bare, need to use fetch and reset
+        git(['fetch','--all'])
+        git(['reset','--hard','origin/master'])
 
         logging.info('Updated repo, restarting' )
 
