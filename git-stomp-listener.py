@@ -12,7 +12,7 @@ def setup_logging():
     logger = logging.getLogger()
 
     #To get more logs, change this to DEBUG
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.DEBUG)
 
     filehandler = logging.handlers.TimedRotatingFileHandler('/tmp/daemon.log',
                                                             when='midnight',
