@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys
+import os, sys
 from stomplistenerdaemon import StompListenerDaemon
 
 #stomp uses logging module
@@ -15,6 +15,9 @@ filehandler = logging.handlers.TimedRotatingFileHandler('/tmp/daemon.log',when='
 formatter = logging.Formatter("%(asctime)-15s %(name)s: %(message)s")
 filehandler.setFormatter(formatter)
 logger.addHandler(filehandler)
+
+#help python find the stomp module packaged with the script
+os.chdir(os.path.dirname(sys.argv[0]))
 
 if __name__ == "__main__":
     daemon = StompListenerDaemon('/var/tmp/stomp-listener.pid')
