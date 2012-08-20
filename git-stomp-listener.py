@@ -20,7 +20,7 @@ logger.addHandler(filehandler)
 #help python find the stomp module packaged with the script
 os.chdir(os.path.dirname(sys.argv[0]))
 
-def drop_privileges(uid_name='nobody', gid_name='nogroup'):
+def drop_privileges(uid_name='nobody', gid_name='nobody'):
     if os.getuid() != 0:
         # We're not root so, like, whatever dude
         return
