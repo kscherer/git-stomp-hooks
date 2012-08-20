@@ -14,4 +14,5 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
     logging.info('Updating bare2')
 
     #prune will delete branches that have been deleted from origin
+    #only works of repo is bare and has remote mirror configured
     git(['remote','update','--prune'])
