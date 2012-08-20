@@ -22,6 +22,7 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
         #restart the service to pick up any changes
         os.execl(sys.executable, sys.executable,'start')
     else:
+        #use the default environment.
         branchname = os.path.basename(refname)
         puppet_env_base = '/etc/puppet/environments'
         puppet_env = puppet_env_base + '/' + branchname
