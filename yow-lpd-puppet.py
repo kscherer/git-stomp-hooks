@@ -21,7 +21,7 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
         logging.info('Updated repo, restarting' )
 
         #restart the service to pick up any changes
-        os.execl(sys.executable, sys.executable,'start')
+        os.execl(sys.executable, *([sys.executable]+sys.argv))
     else:
         #use the default environment.
         branchname = os.path.basename(refname)
