@@ -41,11 +41,13 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
         else:
             if os.path.exists(puppet_env) and os.path.isdir(puppet_env):
                 #environment already exists, just update
+                os.chdir(puppet_env)
                 git(['fetch','--all'])
                 git(['reset','--hard','origin/' + branchname])
                 logging.info('Updated environment %s.' % puppet_env)
             else:
                 #new branch, so clone puppet repo to new branch
+                os.chdir(puppet_env_base)
                 git(['clone',
                      'git://ala-git.wrs.com/users/buildadmin/wr-puppet-modules.git',
                      puppet_env_base,
