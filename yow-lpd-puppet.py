@@ -16,6 +16,9 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
 
         #prune will delete branches that have been deleted from origin
         git(['remote','update','--prune'])
+
+        #restart the service to pick up any changes
+        os.execl(sys.executable, sys.executable,'start')
     else:
         branchname = os.path.basename(refname)
         puppet_env_base = '/etc/puppet/environments'

@@ -7,18 +7,19 @@ from stomplistenerdaemon import StompListenerDaemon
 #stomp uses logging module
 import logging
 import logging.handlers
-logger = logging.getLogger()
 
-#To get more logs, change this to DEBUG
-logger.setLevel(logging.ERROR)
+def setup_logging():
+    logger = logging.getLogger()
 
-filehandler = logging.handlers.TimedRotatingFileHandler('/tmp/daemon.log',when='midnight',interval=1,backupCount=3)
-formatter = logging.Formatter("%(asctime)-15s %(name)s: %(message)s")
-filehandler.setFormatter(formatter)
-logger.addHandler(filehandler)
+    #To get more logs, change this to DEBUG
+    logger.setLevel(logging.ERROR)
 
-#help python find the stomp module packaged with the script
-os.chdir(os.path.dirname(sys.argv[0]))
+    filehandler = logging.handlers.TimedRotatingFileHandler('/tmp/daemon.log',
+                                                            when='midnight',
+                                                            interval=1,backupCount=3)
+    formatter = logging.Formatter("%(asctime)-15s %(name)s: %(message)s")
+    filehandler.setFormatter(formatter)
+    logger.addHandler(filehandler)
 
 def drop_privileges(uid_name='nobody', gid_name='nobody'):
     if os.getuid() != 0:
@@ -40,7 +41,10 @@ def drop_privileges(uid_name='nobody', gid_name='nobody'):
     old_umask = os.umask(077)
 
 if __name__ == "__main__":
+    #help python find the stomp module packaged with the script
+    os.chdir(os.path.dirname(sys.argv[0]))
     drop_privileges('puppet')
+    setup_logging()
     daemon = StompListenerDaemon('/var/tmp/stomp-listener.pid')
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
