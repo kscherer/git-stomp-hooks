@@ -22,8 +22,8 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
         logging.info('Updated repo, restarting' )
 
         #restart the service to pick up any changes
-        #args = ['python','/var/lib/puppet/repos/git-stomp-hooks/git-stomp-listener.py','restart']
-        #exit_code = subprocess.call(args)
+        args = ['python','/var/lib/puppet/repos/git-stomp-hooks/git-stomp-listener.py','restart']
+        subprocess.Popen(args,stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE,shell=True)
 
     else:
         #use the default environment.
