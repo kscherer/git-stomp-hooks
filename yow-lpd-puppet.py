@@ -50,7 +50,7 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
                 os.chdir(puppet_env_base)
                 git(['clone',
                      'git://ala-git.wrs.com/users/buildadmin/wr-puppet-modules.git',
-                     puppet_env_base,
                      '--branch',
+                     branchname,
                      branchname])
                 logging.info('Created environment %s.' % puppet_env)

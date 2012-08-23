@@ -38,12 +38,12 @@ def drop_privileges(uid_name='nobody', gid_name='nobody'):
     os.setuid(running_uid)
 
     # Ensure a very conservative umask
-    old_umask = os.umask(077)
+    old_umask = os.umask(022)
 
 if __name__ == "__main__":
     #help python find the stomp module packaged with the script
     os.chdir(os.path.dirname(sys.argv[0]))
-    drop_privileges('puppet')
+    drop_privileges('puppet','puppet')
     setup_logging()
     daemon = StompListenerDaemon('/var/tmp/stomp-listener.pid')
     if len(sys.argv) == 2:
