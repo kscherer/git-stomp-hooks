@@ -32,7 +32,7 @@ def on_message(dest, gitdir, old_rev, new_rev, ref_name):
         puppet_env = puppet_env_base + '/' + branchname
 
         #The convention for deleted branches is to have rev = 0000...
-        if new_rev.startswith('0'):
+        if len(new_rev.strip('0') == 0:
             #deleting existing branch
             if os.path.exists(puppet_env) and os.path.isdir(puppet_env):
                 logging.info('Deleting environment %s.' % puppet_env)
