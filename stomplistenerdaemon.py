@@ -56,15 +56,16 @@ class StompListenerDaemon(daemon.Daemon):
         conn=common.createStompConnection()
         conn.set_listener('Git',StompListener())
         conn.start()
-        conn.connect(wait=True)
 
         destinations=HostHandler.getDestination()
-        for dest in destinations:
-            conn.subscribe(destination=dest, ack='auto')
-
         # main work loop
         while not self.is_stopping():
-            time.sleep(60)
+            if not conn.is_connected():
+                conn.connect(wait=True)
+                for dest in destinations:
+                    conn.subscribe(destination=dest, ack='auto')
+
+            time.sleep(5)
 
         # SIGTERM receieved so we have exited loop
         conn.stop()
