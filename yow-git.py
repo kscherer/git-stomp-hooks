@@ -3,6 +3,7 @@ import os, sys
 import logging
 import shutil
 import common
+import signal
 import subprocess
 git = common.git
 
@@ -19,6 +20,10 @@ def on_message(headers, message):
     if dest == "/topic/git/stomp-hook":
         repodir = '/var/lib/puppet/repos/git-stomp-hooks'
         os.chdir(repodir)
+
+        #Since repo is non-bare, need to use fetch and reset
+        git(['fetch','--all'])
+        git(['reset','--hard','origin/master'])
 
         logging.info('Auto-restarting daemon to pick up changes' )
 

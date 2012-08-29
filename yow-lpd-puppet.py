@@ -21,9 +21,14 @@ def on_message(headers, message):
         repodir = '/var/lib/puppet/repos/git-stomp-hooks'
         os.chdir(repodir)
 
+        #Since repo is non-bare, need to use fetch and reset
+        git(['fetch','--all'])
+        git(['reset','--hard','origin/master'])
+
         logging.info('Auto-restarting daemon to pick up changes' )
 
         os.environ["PATH"] = os.environ["PATH"] + ":" + repodir
+        args = ["reloader.py"]
         subprocess.Popen(args)
 
         #send sigterm to have this instance clean up properly using sigterm handler
