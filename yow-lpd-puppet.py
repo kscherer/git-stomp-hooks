@@ -3,6 +3,7 @@ import os, sys
 import logging
 import shutil
 import common
+import signal
 import subprocess
 git = common.git
 
@@ -11,19 +12,22 @@ def getDestination():
     return ["/topic/git/puppet", "/topic/git/stomp-hook"]
 
 #callback when a stomp message arrives
-def on_message(dest, gitdir, old_rev, new_rev, ref_name):
+def on_message(headers, message):
+
+    dest = headers['destination']
+    gitdir, old_rev, new_rev, ref_name = message.strip().split(' ')
+
     if dest == "/topic/git/stomp-hook":
-        os.chdir('/var/lib/puppet/repos/git-stomp-hooks')
+        repodir = '/var/lib/puppet/repos/git-stomp-hooks'
+        os.chdir(repodir)
 
-        #Since repo is non-bare, need to use fetch and reset
-        git(['fetch','--all'])
-        git(['reset','--hard','origin/master'])
+        logging.info('Auto-restarting daemon to pick up changes' )
 
-        logging.info('Updated repo, restarting' )
+        os.environ["PATH"] = os.environ["PATH"] + ":" + repodir
+        subprocess.Popen(args)
 
-        #restart the service to pick up any changes
-        #args = ['python','/var/lib/puppet/repos/git-stomp-hooks/git-stomp-listener.py','restart']
-        #subprocess.Popen(args,stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE,shell=True)
+        #send sigterm to have this instance clean up properly using sigterm handler
+        os.kill(os.getpid(), signal.SIGTERM)
 
     else:
         #use the default environment.

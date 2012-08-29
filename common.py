@@ -21,4 +21,8 @@ def getActiveMQServer():
     return 'ala-lpd-puppet.wrs.com'
 
 def createStompConnection():
+    #local debugging and testing with stompserver
+    if platform.node() == 'yow-kscherer-l1':
+        return stomp.Connection([('localhost', 6163)])
+
     return stomp.Connection([(getActiveMQServer(), 6163)], 'amq', 'secret')

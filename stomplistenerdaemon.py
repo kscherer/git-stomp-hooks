@@ -13,12 +13,24 @@ HostHandler = __import__(platform.node())
 
 class StompListener(stomp.ConnectionListener):
     def on_error(self, headers, message):
-        print('received an error %s' % message)
+        logging.error('received an error %s' % message)
     def on_message(self, headers, message):
-        #extract info from message
-        dest = headers['destination']
-        gitdir, old_rev, new_rev, ref_name = message.strip().split(' ')
-        HostHandler.on_message(dest, gitdir, old_rev, new_rev, ref_name)
+        HostHandler.on_message(headers, message)
+
+class AutoConnectListener(stomp.ConnectionListener):
+    def __init__(self, connection ):
+        self.__connection = connection
+        self.__destinations = HostHandler.getDestination()
+
+    def on_connecting(self, host_and_port):
+        self.__connection.connect()
+
+    def on_connected(self, headers, body):
+        for dest in self.__destinations:
+            self.__connection.subscribe(destination=dest, ack='auto')
+
+    def on_disconnected(self):
+        logging.info('Received disconnect event')
 
 class StompListenerDaemon(daemon.Daemon):
     """
@@ -54,18 +66,22 @@ class StompListenerDaemon(daemon.Daemon):
         signal.signal(signal.SIGTERM, self.set_stop)
 
         conn=common.createStompConnection()
+        conn.set_listener('Auto',AutoConnectListener(conn))
         conn.set_listener('Git',StompListener())
-        conn.start()
 
         destinations=HostHandler.getDestination()
         # main work loop
         while not self.is_stopping():
-            if not conn.is_connected():
-                conn.connect(wait=True)
-                for dest in destinations:
-                    conn.subscribe(destination=dest, ack='auto')
+            if not conn.connected:
+                logging.info('Attempting to restart connection')
+                try:
+                    conn.start()
+                except:
+                    #Wait a bit and try again
+                    logging.info('Connection failed. Will try again.')
 
-            time.sleep(5)
+            time.sleep(2)
 
         # SIGTERM receieved so we have exited loop
+        logging.info('Main loop exited')
         conn.stop()
