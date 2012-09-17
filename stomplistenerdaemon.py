@@ -65,6 +65,9 @@ class StompListenerDaemon(daemon.Daemon):
         # register our signal handler
         signal.signal(signal.SIGTERM, self.set_stop)
 
+        #setup a reasonable umask after daemon code cleared it
+        os.umask(022)
+
         conn=common.createStompConnection()
         conn.set_listener('Auto',AutoConnectListener(conn))
         conn.set_listener('Git',StompListener())
