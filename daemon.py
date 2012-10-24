@@ -81,6 +81,12 @@ class Daemon(object):
             pf = file(self.pidfile,'r')
             pid = int(pf.read().strip())
             pf.close()
+
+            #Make sure pid in file is valid. Linux only
+            if pid < 1 or not os.path.exists("/proc/{}".format(pid)):
+                delpid()
+                pid = None
+
         except IOError:
             pid = None
 
