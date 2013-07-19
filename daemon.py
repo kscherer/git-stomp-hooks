@@ -84,7 +84,7 @@ class Daemon(object):
 
             #Make sure pid in file is valid. Linux only
             if pid < 1 or not os.path.exists("/proc/{0}".format(pid)):
-                delpid()
+                self.delpid()
                 pid = None
 
         except IOError:
