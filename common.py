@@ -14,7 +14,7 @@ def getActiveMQServer():
     hostname = platform.node()
     site_prefix = hostname[0:3]
     if site_prefix == 'yow':
-        return 'yow-lpg-amqp.wrs.com'
+        return 'yow-lpd-puppet2.wrs.com'
     elif site_prefix == 'pek':
         return 'pek-lpd-puppet.wrs.com'
 
