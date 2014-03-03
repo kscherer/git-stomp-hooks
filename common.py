@@ -22,7 +22,7 @@ def getActiveMQServer():
 
 def createStompConnection():
     #local debugging and testing with stompserver
-    if platform.node() == 'yow-kscherer-l1':
-        return stomp.Connection([('localhost', 6163)])
+    if platform.node() == 'yow-kscherer-d1':
+        return stomp.Connection([('localhost', 61613)])
 
     return stomp.Connection([(getActiveMQServer(), 6163)], 'amq', 'secret')

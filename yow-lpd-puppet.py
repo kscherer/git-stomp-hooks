@@ -55,11 +55,9 @@ def on_message(headers, message):
                 git(['reset','--hard','origin/' + branchname])
                 logging.info('Updated environment %s.' % puppet_env)
             else:
-                #new branch, so clone puppet repo to new branch
+                #new branch, so clone puppet repo to directory with name of branch
                 os.chdir(puppet_env_base)
-                git(['clone',
+                git(['clone', '--branch', branchname,
                      'git://ala-git.wrs.com/users/buildadmin/wr-puppet-modules.git',
-                     '--branch',
-                     branchname,
                      branchname])
                 logging.info('Created environment %s.' % puppet_env)
