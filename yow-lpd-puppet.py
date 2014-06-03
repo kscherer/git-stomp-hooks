@@ -65,4 +65,4 @@ def on_message(headers, message):
                 logging.info('Created environment %s.', puppet_env)
 
         #trigger restart of puppet master
-        subprocess.Popen(['touch', '/etc/puppet/rack/tmp/restart.txt'], stdout=subprocess.PIPE)
+        subprocess.Popen(['/bin/touch', '/etc/puppet/rack/tmp/restart.txt'], stdout=subprocess.PIPE)
