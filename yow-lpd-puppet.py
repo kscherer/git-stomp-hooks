@@ -6,11 +6,22 @@ import common
 import signal
 import subprocess
 git = common.git
+RUBY193 = "/opt/rh/ruby193/root"
 
 
 def getDestination():
     """return an array of channels to subscribe to"""
     return ["/topic/git/puppet", "/topic/git/stomp-hook"]
+
+
+def trigger_librarian_puppet(puppet_env):
+    """Call librarian-puppet install in the puppet environment dir"""
+    args = [RUBY193 + '/usr/local/bin/librarian-puppet', 'install', '--quiet']
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, cwd=puppet_env,
+                            env={"LD_LIBRARY_PATH": RUBY193 + "/usr/lib64"})
+    details = proc.stdout.read()
+    details = details.strip()
+    return details
 
 
 def on_message(headers, message):
@@ -40,7 +51,7 @@ def on_message(headers, message):
         #use the default environment.
         branchname = os.path.basename(ref_name)
         puppet_env_base = '/etc/puppet/environments'
-        puppet_env = puppet_env_base + '/' + branchname
+        puppet_env = os.path.join(puppet_env_base, branchname)
 
         #The convention for deleted branches is to have rev = 0000...
         if len(new_rev.strip('0')) == 0:
@@ -55,6 +66,11 @@ def on_message(headers, message):
                 os.chdir(puppet_env)
                 git(['fetch', '--all'])
                 git(['reset', '--hard', 'origin/' + branchname])
+                files_changed = git(['show', '--pretty=format:', '--name-only',
+                                     old_rev + '..' + new_rev])
+                if 'Puppetfile' in files_changed:
+                    trigger_librarian_puppet(puppet_env)
+
                 logging.info('Updated environment %s.', puppet_env)
             else:
                 #new branch, so clone puppet repo to directory with name of branch
@@ -62,6 +78,8 @@ def on_message(headers, message):
                 git(['clone', '--branch', branchname,
                      'git://ala-git.wrs.com/users/buildadmin/wr-puppet-modules.git',
                      branchname])
+                os.chdir(puppet_env)
+                trigger_librarian_puppet(puppet_env)
                 logging.info('Created environment %s.', puppet_env)
 
         #trigger restart of puppet master
