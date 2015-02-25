@@ -18,7 +18,8 @@ def trigger_librarian_puppet(puppet_env):
     """Call librarian-puppet install in the puppet environment dir"""
     args = [RUBY193 + '/usr/local/bin/librarian-puppet', 'install', '--quiet']
     proc = subprocess.Popen(args, stdout=subprocess.PIPE, cwd=puppet_env,
-                            env={"LD_LIBRARY_PATH": RUBY193 + "/usr/lib64"})
+                            env={"LD_LIBRARY_PATH": RUBY193 + "/usr/lib64",
+                                 "PATH": "/bin:/usr/bin:/usr/sbin:/sbin"})
     details = proc.stdout.read()
     details = details.strip()
     return details
