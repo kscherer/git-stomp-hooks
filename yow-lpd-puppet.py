@@ -67,8 +67,11 @@ def on_message(headers, message):
                 os.chdir(puppet_env)
                 git(['fetch', '--all'])
                 git(['reset', '--hard', 'origin/' + branchname])
+                rev_range = old_rev
+                if old_rev != new_rev:
+                    rev_range = old_rev + '..' + new_rev
                 files_changed = git(['show', '--pretty=format:', '--name-only',
-                                     old_rev + '..' + new_rev])
+                                     rev_range])
                 if 'Puppetfile' in files_changed:
                     trigger_librarian_puppet(puppet_env)
 
