@@ -68,7 +68,10 @@ def on_message(headers, message):
                 os.chdir(puppet_env)
                 git(['fetch', '--all'])
                 git(['reset', '--hard', 'origin/' + branchname])
-                trigger_librarian_puppet(puppet_env)
+                files_changed = git(['show', '--pretty=format:', '--name-only',
+                                     old_rev + '..' + new_rev])
+                if 'Puppetfile' in files_changed:
+                    trigger_librarian_puppet(puppet_env)
 
                 logging.info('Updated environment %s.', puppet_env)
             else:
