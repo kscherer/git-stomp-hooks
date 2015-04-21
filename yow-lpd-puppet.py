@@ -66,6 +66,8 @@ def on_message(headers, message):
             if os.path.exists(puppet_env) and os.path.isdir(puppet_env):
                 #environment already exists, just update
                 os.chdir(puppet_env)
+                git(['fetch', '--all'])
+                git(['reset', '--hard', 'origin/' + branchname])
 
                 logging.info('Updated environment %s.', puppet_env)
             else:
