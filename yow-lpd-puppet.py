@@ -66,12 +66,6 @@ def on_message(headers, message):
             if os.path.exists(puppet_env) and os.path.isdir(puppet_env):
                 #environment already exists, just update
                 os.chdir(puppet_env)
-                git(['fetch', '--all'])
-                git(['reset', '--hard', 'origin/' + branchname])
-                files_changed = git(['show', '--pretty=format:', '--name-only',
-                                     old_rev + '..' + new_rev])
-                if 'Puppetfile' in files_changed:
-                    trigger_librarian_puppet(puppet_env)
 
                 logging.info('Updated environment %s.', puppet_env)
             else:
@@ -81,8 +75,11 @@ def on_message(headers, message):
                      'git://ala-git.wrs.com/users/buildadmin/wr-puppet-modules.git',
                      branchname])
                 os.chdir(puppet_env)
-                trigger_librarian_puppet(puppet_env)
                 logging.info('Created environment %s.', puppet_env)
+
+            # Trigger librarian-puppet on every run because attempts
+            # to be smarter about it haven't worked
+            trigger_librarian_puppet(puppet_env)
 
         #trigger restart of puppet master
         subprocess.Popen(['/bin/touch', '/etc/puppet/rack/tmp/restart.txt'], stdout=subprocess.PIPE)
