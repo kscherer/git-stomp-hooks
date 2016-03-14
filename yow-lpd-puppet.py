@@ -78,6 +78,7 @@ def on_message(headers, message):
                      'git://ala-git.wrs.com/users/buildadmin/wr-puppet-modules.git',
                      branchname])
                 os.chdir(puppet_env)
+                shutil.copytree('../production/.tmp', '.tmp')
                 logging.info('Created environment %s.', puppet_env)
 
             # Trigger librarian-puppet on every run because attempts
