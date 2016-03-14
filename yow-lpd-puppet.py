@@ -1,10 +1,11 @@
-
 import os
 import logging
 import shutil
-import common
 import signal
 import subprocess
+
+import common
+
 git = common.git
 RUBY193 = "/opt/rh/ruby193/root"
 
@@ -36,7 +37,7 @@ def on_message(headers, message):
         repodir = '/var/lib/puppet/repos/git-stomp-hooks'
         os.chdir(repodir)
 
-        #Since repo is non-bare, need to use fetch and reset
+        # Since repo is non-bare, need to use fetch and reset
         git(['fetch', '--all'])
         git(['reset', '--hard', 'origin/master'])
 
@@ -46,32 +47,32 @@ def on_message(headers, message):
         args = ["reloader.py"]
         subprocess.Popen(args)
 
-        #send sigterm to have this instance clean up properly using sigterm handler
+        # send sigterm to have this instance clean up properly using sigterm handler
         os.kill(os.getpid(), signal.SIGTERM)
 
     else:
-        #use the default environment.
+        # use the default environment.
         branchname = os.path.basename(ref_name)
         puppet_env_base = '/etc/puppet/environments'
         puppet_env = os.path.join(puppet_env_base, branchname)
 
-        #The convention for deleted branches is to have rev = 0000...
+        # The convention for deleted branches is to have rev = 0000...
         if len(new_rev.strip('0')) == 0:
-            #deleting existing branch
+            # deleting existing branch
             if os.path.exists(puppet_env) and os.path.isdir(puppet_env):
                 logging.info('Deleting environment %s.', puppet_env)
                 shutil.rmtree(puppet_env)
 
         else:
             if os.path.exists(puppet_env) and os.path.isdir(puppet_env):
-                #environment already exists, just update
+                # environment already exists, just update
                 os.chdir(puppet_env)
                 git(['fetch', '--all'])
                 git(['reset', '--hard', 'origin/' + branchname])
 
                 logging.info('Updated environment %s.', puppet_env)
             else:
-                #new branch, so clone puppet repo to directory with name of branch
+                # new branch, so clone puppet repo to directory with name of branch
                 os.chdir(puppet_env_base)
                 git(['clone', '--branch', branchname,
                      'git://ala-git.wrs.com/users/buildadmin/wr-puppet-modules.git',
@@ -83,5 +84,5 @@ def on_message(headers, message):
             # to be smarter about it haven't worked
             trigger_librarian_puppet(puppet_env)
 
-        #trigger restart of puppet master
+        # trigger restart of puppet master
         subprocess.Popen(['/bin/touch', '/etc/puppet/rack/tmp/restart.txt'], stdout=subprocess.PIPE)
